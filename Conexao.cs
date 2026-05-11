@@ -5,13 +5,16 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using MySql.Data.MySqlClient;
+using System.Configuration;
 
 namespace gerenciamento_impressora
 {
     internal class Conexao
     {
         // Banco SQLite local (arquivo .db)
-        public string conec = "SERVER=10.184.45.22; DATABASE=impressora_adm; UID=root; PWD=0828; PORT=3306;";
+        //public string conec = "SERVER=10.184.45.29; DATABASE=impressora_adm; UID=root; PWD=0828; PORT=3306;";
+        // Lê do App.config
+        public string conec = ConfigurationManager.ConnectionStrings["Banco"].ConnectionString;
 
         public MySqlConnection con = null;
 

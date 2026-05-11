@@ -1,4 +1,5 @@
 ﻿using MySql.Data.MySqlClient;
+using PDV;
 using SnmpSharpNet;
 using System;
 using System.Collections.Generic;
@@ -110,6 +111,7 @@ namespace gerenciamento_impressora
         private void Form1_Load(object sender, EventArgs e)
         {
             Listar();
+            lbNome.Text = Sessao.NomeUsuario;
         }
 
         private void Form1_Shown(object sender, EventArgs e)
@@ -230,6 +232,17 @@ namespace gerenciamento_impressora
             }
 
             btnAtualizarToner.Enabled = true;
+        }
+
+        private void Form1_FormClosed(object sender, FormClosedEventArgs e)
+        {
+            Application.Exit();
+        }
+
+        private void logsToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            FrmLogs frm = new FrmLogs();
+            frm.Show();
         }
     }
 }

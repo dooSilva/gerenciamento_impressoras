@@ -1,14 +1,15 @@
 ﻿using MySql.Data.MySqlClient;
+using SnmpSharpNet;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Data;
 using System.Drawing;
 using System.Linq;
+using System.Reflection;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
-using SnmpSharpNet;
 
 namespace gerenciamento_impressora
 {
@@ -112,16 +113,35 @@ namespace gerenciamento_impressora
         {
             con.AbrirConexao();
 
+            // 1. Buscar a quantidade antiga para o Log
+            string qtdAntiga = "";
+            string sqlBusca = "SELECT quantidade FROM tonners WHERE id = @id";
+            using (MySqlCommand cmdBusca = new MySqlCommand(sqlBusca, con.con))
+            {
+                cmdBusca.Parameters.AddWithValue("@id", id);
+                var resultado = cmdBusca.ExecuteScalar();
+                qtdAntiga = resultado != null ? resultado.ToString() : "0";
+            }
+
+            // 2. Executar o UPDATE
             sql = "UPDATE tonners SET modelo = @modelo, quantidade = @quantidade, cor = @cor WHERE id = @id";
             cmd = new MySqlCommand(sql, con.con);
             cmd.Parameters.AddWithValue("@id", id);
             cmd.Parameters.AddWithValue("@modelo", txtModelo.Text);
             cmd.Parameters.AddWithValue("@quantidade", txtQuantidade.Text);
             cmd.Parameters.AddWithValue("@cor", txtCor.Text);
-
-
             cmd.ExecuteNonQuery();
+
+            // 3. Registrar o Log usando o texto do txtModelo para ficar legível
+            if (qtdAntiga != txtQuantidade.Text)
+            {
+                // Aqui usamos o texto da TextBox para o log ser amigável
+                string mensagemLog = $"Alterou estoque do: {txtModelo.Text} cor: {txtCor.Text} de {qtdAntiga} para {txtQuantidade.Text}";
+                Log.Registrar(mensagemLog);
+            }
+
             MessageBox.Show("Produto alterado com sucesso!", "Alterado!", MessageBoxButtons.OK, MessageBoxIcon.Information);
+
             con.FecharConexao();
             LimparCampos();
             Listar();
@@ -131,7 +151,7 @@ namespace gerenciamento_impressora
         {
             txtModelo.Text = "";
             txtQuantidade.Text = "";
-            txtQuantidade.Text = "";
+            txtCor.Text = "";
         }
 
     }
